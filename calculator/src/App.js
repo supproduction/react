@@ -4,30 +4,23 @@ import DateFields from './DateFields/DateFields';
 import Radio from './Radio/Radio';
 
 class App extends Component {
+  state = {
+    fullPrice: 0,
+    currentPrice: 0,
+    type: null,
+    radio: 'person',
+    weekend: false,
+    amount: 1,
+    person: {
+      weekday: 50,
+      weekend: 70
+    },
+    group: {
+      weekday: 40,
+      weekend: 45
+    }
+  };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      fullPrice: 0,
-      currentPrice: 0,
-      type: null,
-      radio: 'person',
-      weekend: false,
-      amount: 1,
-      person: {
-        weekday: 50,
-        weekend: 70
-      },
-      group: {
-        weekday: 40,
-        weekend: 45
-      }
-    };
-    this.changeWeekend = this.changeWeekend.bind(this);
-    this.handleRadioChange = this.handleRadioChange.bind(this);
-    this.handleAmountChange = this.handleAmountChange.bind(this);
-    this.handleClickChange = this.handleClickChange.bind(this);
-  }
   static getDerivedStateFromProps(nextProps, prevState) {
     if (prevState !== nextProps) {
       let currentPrice = null;
@@ -54,7 +47,7 @@ class App extends Component {
     return null
   }
 
-  handleRadioChange(checked) {
+  handleRadioChange = (checked) => {
     let amount = checked === 'group' ? 10 : this.state.amount >= 10 && checked === 'person' ? 9 : this.state.amount;
 
     this.setState({
@@ -63,7 +56,7 @@ class App extends Component {
     })
   }
 
-  handleAmountChange(e) {
+  handleAmountChange = (e) => {
     let radio = +e.target.value >= 10 ? 'group' : 'person';
 
     this.setState({
@@ -72,13 +65,13 @@ class App extends Component {
     })
   }
 
-  handleClickChange(val) {
+  handleClickChange = (val) => {
     let amount = +this.state.amount+val > 0 ? +this.state.amount+val : 1;
     let radio = +this.state.amount+val > 9 ? 'group' : 'person';
     this.setState({amount, radio});
   }
 
-  changeWeekend(weekend) {
+  changeWeekend = (weekend) => {
     this.setState({
       weekend: weekend
     });

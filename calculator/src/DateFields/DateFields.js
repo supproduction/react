@@ -3,15 +3,11 @@ import '../App.css';
 import Select from '../Select/Select';
 
 class DateFields extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      months: {list: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], selected: 0, label: "months"},
-      years: {list: [2018, 2017, 2016, 2015, 2014, 2013], selected: 2018, label: "years"},
-      days: {list: null, selected: 1, label: "days"}
-    };
-    this.onChangeHandler = this.onChangeHandler.bind(this);
-  }
+  state = {
+    months: {list: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"], selected: 0, label: "months"},
+    years: {list: [2018, 2017, 2016, 2015, 2014, 2013], selected: 2018, label: "years"},
+    days: {list: null, selected: 1, label: "days"}
+  };
 
   componentDidMount() {
     let selectedYear = this.state.years.selected;
@@ -59,7 +55,7 @@ class DateFields extends Component {
     }
   }
 
-  onChangeHandler(e) {
+  onChangeHandler = (e) => {
     let {id, value} = e.target;
     let newSelectedState = {
       ...this.state,
@@ -94,27 +90,33 @@ class DateFields extends Component {
     const monthsList = monthSelect.list.map((item, index) =>
                         <option key={index} value={index}>{item}</option>
                       );
-    const daysList = [];
 
-    for (let i = 1; i <= daysSelect.list; i++) {
-      daysList.push(<option key={i} value={i}>{i}</option>)
-    }
+    const daysList = [...Array(daysSelect.list).keys()].map(day => {
+      let i = day + 1;
+      return <option key={i} value={i}>{i}</option>
+    });
 
     return (
       <fieldset className="row">
         <legend>Дата</legend>
         <div className="large-4 columns">
-          <Select label="Год" id={yearSelect.label} value={yearSelect.selected.toString()} onChange={this.onChangeHandler}>
+          <Select label="Год" id={yearSelect.label}
+                  value={yearSelect.selected.toString()}
+                  onChange={this.onChangeHandler}>
             {yearsList}
           </Select>
         </div>
         <div className="large-4 columns">
-          <Select label="Месяц" id={monthSelect.label} value={monthSelect.selected.toString()} onChange={this.onChangeHandler}>
+          <Select label="Месяц" id={monthSelect.label}
+                  value={monthSelect.selected.toString()}
+                  onChange={this.onChangeHandler}>
             {monthsList}
           </Select>
         </div>
         <div className="large-4 columns">
-          <Select label="Дата" id={daysSelect.label} value={daysSelect.selected.toString()} onChange={this.onChangeHandler}>
+          <Select label="Дата" id={daysSelect.label}
+                  value={daysSelect.selected.toString()}
+                  onChange={this.onChangeHandler}>
             {daysList}
           </Select>
         </div>

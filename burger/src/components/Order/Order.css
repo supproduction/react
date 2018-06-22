@@ -1,0 +1,29 @@
+.Order {
+    width: 80%;
+    border: 1px solid #eee;
+    box-shadow: 0 2px 3px #ccc;
+    padding: 10px;
+    margin: 10px auto;
+    box-sizing: border-box;
+}
+
+.Cross {
+    width: 30px;
+    height: 30px;
+    background: #ccc;
+    border: 0;
+    color: #58589c;
+    outline: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: opacity .3s ease-in-out;
+}
+
+.Cross:hover {
+    opacity: .7;
+}
+
+.BurgerOverlay {
+    max-height: 250px;
+    overflow: auto;
+}
