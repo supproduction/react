@@ -12,7 +12,7 @@ import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import classes from './BurgerBuilder.css';
 
-class BurgerBuilder extends Component {
+export class BurgerBuilder extends Component {
     state = {
         purchasing: false
     }
@@ -33,7 +33,12 @@ class BurgerBuilder extends Component {
     }
 
     purchaseHandler = () => {
-        this.setState({purchasing: true})
+        if (this.props.isAuthenticated) {
+            this.setState({purchasing: true})
+        } else {
+            this.props.onSetAuthRedirectPath('/checkout');
+            this.props.history.push('/auth');
+        }
     }
 
     purchaseCancelHandler = () => {
@@ -67,6 +72,7 @@ class BurgerBuilder extends Component {
                         purchasable={this.updatePurchaseState(this.props.ings)}
                         disabled={disabledInfo}
                         ordered={this.purchaseHandler}
+                        isAuth={this.props.isAuthenticated}
                         reset={this.props.onIngredientsReset}
                         onInputChanged={this.props.onIngredientChangedAmount}
                         ingredientRemove={this.props.onIngredientRemoved}
@@ -96,7 +102,8 @@ const mapStateToProps = state => {
     return {
         ings: state.burgerBuilderReducer.ingredients,
         prise: state.burgerBuilderReducer.totalPrice,
-        error: state.burgerBuilderReducer.error
+        error: state.burgerBuilderReducer.error,
+        isAuthenticated: state.auth.token !== null
     }
 };
 
@@ -107,7 +114,8 @@ const mapDispatchToProps = dispatch => {
         onIngredientsReset: () => dispatch(actions.resetIngredients()),
         onIngredientsInit: () => dispatch(actions.initIngredients()),
         onInitPurchase: () => dispatch(actions.purchaseInit()),
-        onIngredientChangedAmount: (amount, ingName) => dispatch(actions.changeAmountIngredient(amount, ingName))
+        onIngredientChangedAmount: (amount, ingName) => dispatch(actions.changeAmountIngredient(amount, ingName)),
+        onSetAuthRedirectPath: (path) => dispatch(actions.setAuthRedirect(path))
     }
 };
 

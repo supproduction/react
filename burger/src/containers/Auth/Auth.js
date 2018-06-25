@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 
 import * as actions from '../../store/actions/index';
 import classes from './Auth.css';
@@ -7,6 +8,7 @@ import classes from './Auth.css';
 import Input from '../../components/UI/Input/Input';
 import Button from '../../components/UI/Button/Button';
 import Spinner from '../../components/UI/Spinner/Spinner';
+import { checkValidity } from '../../shared/utility';
 
 class Auth extends Component {
     state = {
@@ -44,25 +46,6 @@ class Auth extends Component {
         isSignUp: true
     }
 
-    checkValidity(value, rules) {
-        let isValid = true;
-
-        if (rules.required) {
-            isValid = value.trim() !== '' && isValid;
-        }
-
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if (rules.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        return isValid;
-    }
-
     inputChangedHandler = (e, inputId) => {
         const isValidity = this.state.controls[inputId].validation;
         const updatedOrderForm = {
@@ -75,7 +58,7 @@ class Auth extends Component {
         };
 
         if (isValidity) {
-            updatedOrderForm[inputId].valid = this.checkValidity(e.target.value, this.state.controls[inputId].validation);
+            updatedOrderForm[inputId].valid = checkValidity(e.target.value, this.state.controls[inputId].validation);
         }
 
         let formIsValid = true;
@@ -100,6 +83,12 @@ class Auth extends Component {
         })
     }
 
+    componentDidMount() {
+        if (!this.props.builtBurger && this.props.redirectPath !== '/') {
+            this.props.onSetAuthRedirectPath('/')
+        }
+    }
+
     render() {
         const formElementsArray = [];
         for (let key in this.state.controls) {
@@ -118,11 +107,11 @@ class Auth extends Component {
                 shouldValidate={formElement.config.validation}
                 touched={formElement.config.touched}
                 changed={(event) => this.inputChangedHandler(event, formElement.id)}
-                value={formElement.config.value}/>
+                value={formElement.config.value} />
         ));
 
         if (this.props.loading) {
-            form = <Spinner/>
+            form = <Spinner />
         }
 
         let errorMessage = null;
@@ -132,8 +121,16 @@ class Auth extends Component {
                 <p>{this.props.error.message}</p>
             )
         }
+
+        let authRedirect = null;
+
+        if (this.props.isAuthenticated) {
+            authRedirect = <Redirect to={this.props.redirectPath} />
+        }
+
         return (
             <div className={classes.Auth}>
+                {authRedirect}
                 {errorMessage}
                 <form onSubmit={this.submitHandler}>
                     {form}
@@ -150,13 +147,17 @@ class Auth extends Component {
 const mapStateToProps = state => {
     return {
         loading: state.auth.loading,
-        error: state.auth.error
+        error: state.auth.error,
+        isAuthenticated: state.auth.token !== null,
+        redirectPath: state.auth.authRedirect,
+        builtBurger: state.burgerBuilderReducer.built
     }
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        onAuth: (email, pass, idSignup) => dispatch(actions.auth(email, pass, idSignup))
+        onAuth: (email, pass, idSignup) => dispatch(actions.auth(email, pass, idSignup)),
+        onSetAuthRedirectPath: (path) => dispatch(actions.setAuthRedirect(path))
     }
 };
 

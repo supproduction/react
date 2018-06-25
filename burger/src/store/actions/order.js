@@ -63,10 +63,11 @@ export const fetchOrdersStart = () => {
     }
 };
 
-export const fetchOrders = (token) => {
+export const fetchOrders = (token, userId) => {
     return dispatch => {
         dispatch(fetchOrdersStart());
-        axios.get(`/orders.json?auth=${token}`)
+        const queryParams = `?auth=${token}&orderBy="userId"&equalTo="${userId}"`;
+        axios.get(`/orders.json${queryParams}`)
             .then(res => {
                 const fetchOrders = [];
                 for (let key in res.data) {
@@ -87,9 +88,9 @@ export const deleteOrderStart = (orderId) => {
     }
 };
 
-export const deleteOrder = (orderId) => {
+export const deleteOrder = (orderId, token) => {
     return dispatch => {
         dispatch(deleteOrderStart(orderId));
-        axios.delete(`/orders/${orderId}.json`)
+        axios.delete(`/orders/${orderId}.json?auth=${token}`)
     };
 };

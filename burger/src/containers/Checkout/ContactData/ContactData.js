@@ -8,6 +8,7 @@ import Button from '../../../components/UI/Button/Button';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import Input from '../../../components/UI/Input/Input';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+import { checkValidity } from '../../../shared/utility';
 
 class ContactData extends Component {
     state = {
@@ -105,37 +106,10 @@ class ContactData extends Component {
         const order = {
             ingredients: this.props.ings,
             price: this.props.price,
-            orderData: formData
+            orderData: formData,
+            userId: this.props.userId
         };
         this.props.purchaseBurgerHandler(order, this.props.token);
-    }
-
-    checkValidity(value, rules) {
-        let isValid = true;
-
-        if (rules.required) {
-            isValid = value.trim() !== '' && isValid;
-        }
-
-        if (rules.minLength) {
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if (rules.maxLength) {
-            isValid = value.length <= rules.maxLength && isValid;
-        }
-
-        if (rules.isEmail) {
-            const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        if (rules.isNumeric) {
-            const pattern = /^\d+$/;
-            isValid = pattern.test(value) && isValid
-        }
-
-        return isValid;
     }
 
     inputChangedHandler = (e, inputId) => {
@@ -150,7 +124,7 @@ class ContactData extends Component {
         };
 
         if (isValidity) {
-            updatedOrderForm[inputId].valid = this.checkValidity(e.target.value, this.state.orderForm[inputId].validation);
+            updatedOrderForm[inputId].valid = checkValidity(e.target.value, this.state.orderForm[inputId].validation);
         }
 
         let formIsValid = true;
@@ -182,12 +156,12 @@ class ContactData extends Component {
                            shouldValidate={formElement.config.validation}
                            touched={formElement.config.touched}
                            changed={(event) => this.inputChangedHandler(event, formElement.id)}
-                           value={formElement.config.value}/>
+                           value={formElement.config.value} />
                 ))}
                 <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
             </form>);
         if (this.props.loading) {
-            form = <Spinner/>
+            form = <Spinner />
         }
         return (
             <div className={classes.ContactData}>
@@ -203,7 +177,8 @@ const mapStateToProps = state => {
         ings: state.burgerBuilderReducer.ingredients,
         price: state.burgerBuilderReducer.totalPrice,
         loading: state.orderReducer.loading,
-        token: state.auth.token
+        token: state.auth.token,
+        userId: state.auth.userId
     }
 };
 
