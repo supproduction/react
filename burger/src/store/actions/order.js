@@ -1,6 +1,4 @@
 import * as actionTypes from './actionTypes';
-import axios from '../../axios-orders';
-import { resetIngredients } from './burgerBuilder';
 
 export const purchaseBurgerSuccess = (id, orderData) => {
     return {
@@ -24,16 +22,10 @@ export const purchaseBurgerStart = () => {
 };
 
 export const purchaseBurger = (orderData, token) => {
-    return dispatch => {
-        dispatch(purchaseBurgerStart());
-        axios.post(`/orders.json?auth=${token}`, orderData)
-            .then(response => {
-                dispatch(purchaseBurgerSuccess(response.data.name, orderData));
-                dispatch(resetIngredients());
-            })
-            .catch(error => {
-                dispatch(purchaseBurgerFail(error));
-            });
+    return {
+        type: actionTypes.PURCHASE_INITIATE_BURGER,
+        orderData: orderData,
+        token: token
     };
 };
 
@@ -64,20 +56,10 @@ export const fetchOrdersStart = () => {
 };
 
 export const fetchOrders = (token, userId) => {
-    return dispatch => {
-        dispatch(fetchOrdersStart());
-        const queryParams = `?auth=${token}&orderBy="userId"&equalTo="${userId}"`;
-        axios.get(`/orders.json${queryParams}`)
-            .then(res => {
-                const fetchOrders = [];
-                for (let key in res.data) {
-                    fetchOrders.push({...res.data[key], id: key});
-                }
-                dispatch(fetchOrdersSuccess(fetchOrders));
-            })
-            .catch(err => {
-                dispatch(fetchOrdersFail(err));
-            });
+    return {
+        type: actionTypes.FETCH_ORDERS_INITIATE,
+        token: token,
+        userId: userId
     };
 };
 
@@ -89,8 +71,9 @@ export const deleteOrderStart = (orderId) => {
 };
 
 export const deleteOrder = (orderId, token) => {
-    return dispatch => {
-        dispatch(deleteOrderStart(orderId));
-        axios.delete(`/orders/${orderId}.json?auth=${token}`)
+    return {
+        type: actionTypes.DELETE_ORDER_INITIATE,
+        orderId: orderId,
+        token: token
     };
 };
